@@ -1,0 +1,44 @@
+<div class="container">
+  <h2>All Registered Admins</h2>
+  
+  <table class="user-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each admins}}
+        <tr>
+          <td>{{this.firstname}} {{this.lastname}}</td>
+          <td>{{this.email}}</td>
+        </tr>
+      {{else}}
+        <tr>
+          <td colspan="3">No users found.</td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+</div>
+
+<style>
+  .user-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  .user-table th, .user-table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: left;
+  }
+  .user-table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+  }
+  .user-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+</style>

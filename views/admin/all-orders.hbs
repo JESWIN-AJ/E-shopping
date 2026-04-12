@@ -1,0 +1,70 @@
+<section>
+    <div class="container mt-5">
+        <h2 class="text-center mb-5">Customer Order Management</h2>
+
+        {{#each groupedOrders}}
+        <div class="card mb-5 shadow-sm">
+            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                <span><strong>User ID:</strong> {{this.userId}}</span>
+                <span><strong>Contact:</strong> {{this.mobile}}</span>
+            </div>
+
+            <div class="card-body">
+                <p class="text-muted"><strong>Shipping Address:</strong> {{this.address}}</p>
+
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover mt-3">
+                        <thead class="thead-light">
+                            <tr class="text-center">
+                                <th>Date</th>
+                                <th>Products</th>
+                                <th>Total</th>
+                                <th>Payment</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{#each this.userOrders}}
+                            <tr class="text-center align-middle">
+                                <td>{{this.Date}}</td>
+                                <td class="text-left">
+                                    <ul class="list-unstyled mb-0">
+                                        {{#each this.products}}
+                                        <li>• {{this.name}} <span class="badge"
+                                                style="background-color: #cdda9c; color: rgb(103, 57, 57);">x{{this.quantity}}</span>
+                                        </li>
+                                        {{/each}}
+                                    </ul>
+                                </td>
+                                <td><strong>₹{{this.totalAmount}}</strong></td>
+                                <td><span class="text-uppercase small font-weight-bold">{{this.paymentmethod}}</span>
+                                </td>
+                                <td>
+                                    <span id="status"
+                                        class="badge {{#if (eq this.status 'shipped')}}badge-info{{else}}badge-success{{/if}}">
+                                        {{this.status}}
+                                    </span>
+                                </td>
+                                <td>
+                                    <button class="btn btn-primary btn-sm" onclick="shipOrder('{{this._id}}')">
+                                        Ship Order
+                                    </button>
+                                    {{!-- <button class="btn btn-secondary btn-sm" disabled>Shipped</button> --}}
+
+                                </td>
+                            </tr>
+                            {{/each}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {{else}}
+        <div class="text-center mt-5">
+            <h4>No orders available to display.</h4>
+        </div>
+        {{/each}}
+    </div>
+</section>
+

@@ -1,0 +1,452 @@
+<style>
+    :root {
+        --bg: #0d0d0d;
+        --card-bg: #161616;
+        --card-border: #2a2a2a;
+        --accent: #c9a84c;
+        --accent-glow: rgba(201, 168, 76, 0.1);
+        --text-primary: #f0ece4;
+        --text-muted: #7a7570;
+        --input-bg: #1e1e1e;
+        --danger: #e05555;
+        --success: #4caf7d;
+        --warning: #e0a135;
+        --pending: #5b8dd9;
+    }
+
+    .bg-glow {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        overflow: hidden;
+        pointer-events: none;
+    }
+
+    .bg-glow::before {
+        content: '';
+        position: absolute;
+        width: 700px;
+        height: 700px;
+        background: radial-gradient(circle, rgba(201, 168, 76, 0.06) 0%, transparent 70%);
+        top: -150px;
+        left: -150px;
+        border-radius: 50%;
+    }
+
+    .bg-glow::after {
+        content: '';
+        position: absolute;
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(circle, rgba(201, 168, 76, 0.04) 0%, transparent 70%);
+        bottom: -100px;
+        right: -100px;
+        border-radius: 50%;
+    }
+
+    .orders-page {
+        position: relative;
+        z-index: 1;
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 48px 24px 80px;
+    }
+
+    .page-heading {
+        display: flex;
+        align-items: baseline;
+        gap: 14px;
+        margin-bottom: 36px;
+        animation: fadeUp 0.45s ease both;
+    }
+
+    .page-heading h1 {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.2rem;
+        letter-spacing: -0.02em;
+        color: var(--text-primary);
+    }
+
+    .page-heading h1 span {
+        color: var(--accent);
+    }
+
+    .order-count {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 100px;
+        padding: 3px 12px;
+        letter-spacing: 0.06em;
+    }
+
+    @keyframes fadeUp {
+        from {
+            opacity: 0;
+            transform: translateY(24px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* ── Order cards ── */
+    .orders-list {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        animation: fadeUp 0.5s 0.1s ease both;
+    }
+
+    .order-card {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 20px;
+        overflow: hidden;
+        transition: border-color 0.25s, box-shadow 0.25s;
+    }
+
+    .order-card:hover {
+        border-color: rgba(201, 168, 76, 0.25);
+        box-shadow: 0 0 28px rgba(201, 168, 76, 0.05);
+    }
+
+    /* Order header */
+    .order-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px 28px;
+        border-bottom: 1px solid var(--card-border);
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .order-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .order-id {
+        font-family: 'Playfair Display', serif;
+        font-size: 1rem;
+        color: var(--text-primary);
+    }
+
+    .order-id span {
+        color: var(--accent);
+    }
+
+    .order-date {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        letter-spacing: 0.04em;
+    }
+
+    .order-header-right {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .order-total {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.3rem;
+        color: var(--accent);
+    }
+
+    /* Status badge */
+    .status-badge {
+        font-size: 0.72rem;
+        font-weight: 500;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        padding: 5px 14px;
+        border-radius: 100px;
+        border: 1px solid;
+    }
+
+    .status-placed {
+        color: var(--success);
+        border-color: rgba(76, 175, 125, 0.3);
+        background: rgba(76, 175, 125, 0.08);
+    }
+
+    .status-pending {
+        color: var(--pending);
+        border-color: rgba(91, 141, 217, 0.3);
+        background: rgba(91, 141, 217, 0.08);
+    }
+
+    .status-shipped {
+        color: var(--warning);
+        border-color: rgba(224, 161, 53, 0.3);
+        background: rgba(224, 161, 53, 0.08);
+    }
+
+    .status-delivered {
+        color: var(--success);
+        border-color: rgba(76, 175, 125, 0.3);
+        background: rgba(76, 175, 125, 0.08);
+    }
+
+    .status-cancelled {
+        color: var(--danger);
+        border-color: rgba(224, 85, 85, 0.3);
+        background: rgba(224, 85, 85, 0.08);
+    }
+
+    /* Products table */
+    .order-body {
+        padding: 0 28px;
+    }
+
+    .order-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .order-table th {
+        font-size: 0.68rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        padding: 16px 0 12px;
+        text-align: left;
+        border-bottom: 1px solid var(--card-border);
+        font-weight: 400;
+    }
+
+    .order-table th:last-child {
+        text-align: right;
+    }
+
+    .order-table td {
+        padding: 14px 0;
+        font-size: 0.88rem;
+        color: var(--text-primary);
+        border-bottom: 1px solid #1e1e1e;
+        vertical-align: middle;
+    }
+
+    .order-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .order-table td:last-child {
+        text-align: right;
+        color: var(--accent);
+        font-family: 'Playfair Display', serif;
+    }
+
+    .product-thumb {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        object-fit: cover;
+        background: var(--input-bg);
+        border: 1px solid var(--card-border);
+        margin-right: 12px;
+        vertical-align: middle;
+    }
+
+    .product-name-cell {
+        display: flex;
+        align-items: center;
+    }
+
+    .qty-pill {
+        display: inline-block;
+        background: var(--input-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 100px;
+        padding: 2px 10px;
+        font-size: 0.78rem;
+        color: var(--text-muted);
+    }
+
+    /* Order footer */
+    .order-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 28px;
+        background: #111;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .delivery-info {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .delivery-info span {
+        color: var(--text-primary);
+    }
+
+    .payment-pill {
+        font-size: 0.72rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        background: var(--input-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 100px;
+        padding: 4px 12px;
+    }
+
+    /* Empty state */
+    .empty-state {
+        text-align: center;
+        padding: 72px 24px;
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 24px;
+    }
+
+    .empty-icon {
+        font-size: 3rem;
+        margin-bottom: 16px;
+        display: block;
+        opacity: 0.4;
+    }
+
+    .empty-state h3 {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.4rem;
+        color: var(--text-primary);
+        margin-bottom: 8px;
+    }
+
+    .empty-state p {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-bottom: 28px;
+    }
+
+    .btn-shop {
+        display: inline-block;
+        background: var(--accent);
+        color: #0d0d0d;
+        border: none;
+        border-radius: 100px;
+        padding: 13px 36px;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 0.85rem;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        text-decoration: none;
+        transition: opacity 0.2s, transform 0.15s;
+    }
+
+    .btn-shop:hover {
+        opacity: 0.88;
+        transform: translateY(-2px);
+    }
+
+    @media (max-width: 640px) {
+        .order-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .order-table th:nth-child(3),
+        .order-table td:nth-child(3) {
+            display: none;
+        }
+    }
+</style>
+
+<div class="bg-glow"></div>
+
+<div class="orders-page">
+
+    <div class="page-heading">
+        <h1>My <span>Orders</span></h1>
+        <span class="order-count">{{orders.products.length}} orders</span>
+    </div>
+
+    {{#if orders.length}}
+    <div class="orders-list">
+
+        {{#each orders}}
+        <div class="order-card">
+
+            <!-- Order Header -->
+            <div class="order-header">
+                <div class="order-meta">
+                    <div class="order-id">Order <span>#{{this.name}}</span></div>
+                    <div class="order-date">{{this.Date}}</div>
+                </div>
+                <div class="order-header-right">
+                    {{!-- <div class="order-total">₹{{this.totalAmount}}</div> --}}
+                    <span class="status-badge status-{{this.status}}">{{this.status}}</span>
+                </div>
+            </div>
+
+            <!-- Products Table -->
+            <div class="order-body">
+                <table class="order-table">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Qty</th>
+                            <th>Payment</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each this.products}}
+                        <tr>
+                            <td>
+                                <div class="product-name-cell">
+                                    <img class="product-thumb" src="/product-images/{{this.item}}.jpg" alt="product">
+                                    {{this.name}}
+                                </div>
+                            </td>
+                            <td><span class="qty-pill">× {{this.quantity}}</span></td>
+                            <td> {{this.price}}</td>
+                            <td> {{this.total}}</td>
+                        </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Order Footer -->
+            <div class="order-footer">
+                <div class="delivery-info">
+                    📍 <span>{{this.deliveryDetails.address}}</span>, {{this.deliveryDetails.pincode}}
+                    &nbsp;|&nbsp; 📞 <span>{{this.deliveryDetails.mobile}}</span>
+                </div>
+                <span class="payment-pill">{{this.paymentmethod}}</span>
+
+                <span class="order-total">AMOUNT- {{this.totalAmount}}</span>
+            </div>
+
+        </div>
+        {{/each}}
+
+    </div>
+
+    {{else}}
+
+    <div class="empty-state">
+        <span class="empty-icon">📦</span>
+        <h3>No orders yet</h3>
+        <p>Looks like you haven't placed any orders yet.</p>
+        <a href="/" class="btn-shop">Start Shopping</a>
+    </div>
+
+    {{/if}}
+
+</div>
