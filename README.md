@@ -145,22 +145,14 @@ This project uses **Razorpay** as the payment gateway.
 
 ---
 
-## 📸 Screenshots
 
-> Add your screenshots here after running the project!
-
-```
-![Home Page](screenshots/home.png)
-![Cart Page](screenshots/cart.png)
-![Admin Dashboard](screenshots/admin.png)
-```
 
 ---
 
 ## 🙋 Author
 
-**Your Name**
-- GitHub: [@your-username](https://github.com/your-username)
+**JESWIN AJ**
+- GitHub: [@your-username](https://github.com/JESWIN-AJ)
 
 ---
 
