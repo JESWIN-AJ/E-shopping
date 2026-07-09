@@ -218,7 +218,8 @@ var express = require('express');
 var router = express.Router();
 var productHelpers = require('../helpers/product-helpers');
 var adminAuth = require('../auth/adminauth');
-const { verifyAdminToken } = require('../middleware/auth');    
+const { verifyAdminToken } = require('../middleware/auth'); 
+const { uploadImage } = require('../helpers/cloudinary');   
 
 // POST /admin/login
 router.post('/login', (req, res) => {
@@ -242,17 +243,19 @@ router.get('/', verifyAdminToken, (req, res) => {
 });
 
 // POST /admin/add-product
-router.post('/add-product', verifyAdminToken, (req, res) => {
-  productHelpers.addProduct(req.body, (id) => {
+router.post('/add-product', verifyAdminToken, async (req, res) => {
+  try {
+    const id = await productHelpers.addProduct(req.body);
+    let imageUrl = '';
     if (req.files && req.files.image) {
-      req.files.image.mv('./public/product-images/' + id + '.jpg', (err) => {
-        if (err) return res.status(500).json({ error: 'Image upload failed' });
-        res.json({ status: true, productId: id });
-      });
-    } else {
-      res.json({ status: true, productId: id });
+      const result = await uploadImage(req.files.image.tempFilePath || req.files.image.data, id);
+      imageUrl = result.secure_url;
+      await productHelpers.updateProductImage(id, imageUrl);
     }
-  });
+    res.json({ status: true, productId: id, image: imageUrl });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to add product' });
+  }
 });
 
 // DELETE /admin/delete-product/:id
@@ -269,14 +272,17 @@ router.get('/edit-product/:id', verifyAdminToken, (req, res) => {
     .catch((err) => res.status(500).json({ error: 'Failed to fetch product' }));
 });
 
-// PUT /admin/edit-product/:id
+
 router.put('/edit-product/:id', verifyAdminToken, async (req, res) => {
   try {
-    await productHelpers.updateProduct(req.params.id, req.body);
+    let imageUrl = '';
     if (req.files && req.files.image) {
-      req.files.image.mv('./public/product-images/' + req.params.id + '.jpg');
+      const result = await uploadImage(req.files.image.tempFilePath || req.files.image.data, req.params.id);
+      imageUrl = result.secure_url;
+      req.body.image = imageUrl;   // ← add image URL to update payload
     }
-    res.json({ status: true });
+    await productHelpers.updateProduct(req.params.id, req.body);
+    res.json({ status: true, image: imageUrl });
   } catch (err) {
     res.status(500).json({ error: 'Failed to update product' });
   }
