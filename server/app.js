@@ -1,70 +1,81 @@
-require('dotenv').config()
+require('dotenv').config();
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const cors = require('cors');
+const sessionMiddleware = require('./middleware/session');
+const { csrfProtection, csrfHeader } = require('./middleware/csrf');
+const morgan = require('morgan');
+const app = express();
 
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
-var cors = require('cors');
-
-
-var userRouter = require('./routes/user');
-var adminRouter = require('./routes/admin');
-
-var app = express();
-
-var fileUpload = require('express-fileupload');
-const db = require('./config/connection');
+app.use(morgan('dev'));
 
 
 
 
+app.use((req, res, next) => {
+  console.log('=================================');
+  console.log('REQUEST RECEIVED');
+  console.log('Method:', req.method);
+  console.log('URL:', req.originalUrl);
+  console.log('Origin:', req.headers.origin);
+  console.log('Cookies:', req.headers.cookie);
+  console.log('=================================');
+
+  next();
+});
 
 
+
+// Trust proxy (required for secure cookies behind Render proxy)
+app.set('trust proxy', 1);
 
 const allowedOrigins = [
-  process.env.CLIENT_URL_USER || 'http://localhost:5173',
-  process.env.CLIENT_URL_ADMIN || 'http://localhost:5174',
-];
+  process.env.CLIENT_URL_USER,
+  process.env.CLIENT_URL_ADMIN,
+].filter(Boolean);
+
 app.use(cors({
   origin: allowedOrigins,
-  credentials: true
+  credentials: true,
 }));
 
-
-
-app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(fileUpload());
+app.use(sessionMiddleware);
+app.use(csrfProtection);
+app.use(csrfHeader);  // Exposes x-csrf-token header
 
-
-
+// Static files
 app.use('/product-images', express.static(path.join(__dirname, '..', 'public', 'product-images')));
 
-
+// Routes
+const userRouter = require('./routes/user');
+const adminRouter = require('./routes/admin');
 app.use('/', userRouter);
 app.use('/admin', adminRouter);
 
+// CSRF error handler
+app.use((err, req, res, next) => {
+  if (err.code === 'EBADCSRFTOKEN') {
+    return res.status(403).json({ error: 'Invalid CSRF token' });
+  }
+  next(err);
+});
 
-
+// DB connect & listen
+const db = require('./config/connection');
 db.connect((err) => {
   if (err) {
     console.log('Database connection failed:', err);
     process.exit(1);
   }
-
   app.listen(process.env.PORT || 5000, () => {
     console.log('Server running, DB connected');
   });
 });
 
-
-
-
-
-
-
-
+// Logs HTTP requests
 
 module.exports = app;

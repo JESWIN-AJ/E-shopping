@@ -1,53 +1,69 @@
-var db = require('../config/connection')
-var collection = require('../config/colletions')
-const bcrypt = require('bcrypt')
-const jwt = require('jsonwebtoken')
+const db = require('../config/connection');
+const collection = require('../config/colletions');
+const bcrypt = require('bcrypt');
 
 module.exports = {
-  doLogin: (adminData) => {
+  doLogin: (req, res) => {
     return new Promise(async (resolve, reject) => {
       try {
-        let admin = await db.get().collection(collection.ADMIN_COLLECTION).findOne({ email: adminData.email })
-        if (!admin) return resolve({ status: false, error: 'Invalid email or password' })
+        const { email, password } = req.body;
+        const admin = await db.get().collection(collection.ADMIN_COLLECTION).findOne({ email });
+        if (!admin) return resolve({ status: false, error: 'Invalid email or password' });
 
-        const match = await bcrypt.compare(adminData.password, admin.password)
-        if (!match) return resolve({ status: false, error: 'Invalid email or password' })
+        const match = await bcrypt.compare(password, admin.password);
+        if (!match) return resolve({ status: false, error: 'Invalid email or password' });
 
-        const token = jwt.sign(
-          { _id: admin._id, email: admin.email, isAdmin: true },
-          process.env.JWT_SECRET,
-          { expiresIn: '7d' }
-        )
-        resolve({ status: true, token, admin })
+        req.session.admin = { _id: admin._id, email: admin.email, isAdmin: true };
+        req.session.save((err) => {
+          if (err) return resolve({ status: false, error: 'Session save failed' });
+          resolve({ status: true, admin: req.session.admin });
+        });
       } catch (err) {
-        reject(err)
+        reject(err);
       }
-    })
+    });
   },
 
+  doLogout: (req, res) => {
+    return new Promise((resolve) => {
+      req.session.destroy((err) => {
+        res.clearCookie('sid', { httpOnly: true, secure: true, sameSite: 'none', path: '/' });
+        res.clearCookie('csrf-token', { httpOnly: true, secure: true, sameSite: 'none', path: '/' });
+        resolve({ status: true });
+      });
+    });
+  },
+
+  getMe: (req) => {
+    return new Promise((resolve) => {
+      if (req.session.admin) {
+        resolve({ status: true, admin: req.session.admin });
+      } else {
+        resolve({ status: false, error: 'Not authenticated' });
+      }
+    });
+  },
 
   addAdmin: (adminData) => {
     return new Promise(async (resolve, reject) => {
       try {
-        adminData.password = await bcrypt.hash(adminData.password, 10)
-        const data = await db.get().collection(collection.ADMIN_COLLECTION).insertOne(adminData)
-        const token = jwt.sign(
-          { _id: data.insertedId, email: adminData.email, isAdmin: true },
-          process.env.JWT_SECRET,
-          { expiresIn: '7d' }
-        )
-        resolve({ status: true, token, admin: { ...adminData, _id: data.insertedId } })
+        adminData.password = await bcrypt.hash(adminData.password, 10);
+        const data = await db.get().collection(collection.ADMIN_COLLECTION).insertOne(adminData);
+        resolve({ status: true, admin: { ...adminData, _id: data.insertedId } });
       } catch (err) {
-        reject(err)
+        reject(err);
       }
-    })
+    });
   },
 
-  
   getAllUsers: () => {
-    return db.get().collection(collection.USER_COLLECTION).find().toArray()
+    const db = require('../config/connection');
+    const collection = require('../config/colletions');
+    return db.get().collection(collection.USER_COLLECTION).find().toArray();
   },
   getAllAdmins: () => {
-    return db.get().collection(collection.ADMIN_COLLECTION).find().toArray()
-  }
-}
+    const db = require('../config/connection');
+    const collection = require('../config/colletions');
+    return db.get().collection(collection.ADMIN_COLLECTION).find().toArray();
+  },
+};

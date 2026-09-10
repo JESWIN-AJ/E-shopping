@@ -1,0 +1,13 @@
+/* signup.module.css */
+.page { min-height: 100vh; background: var(--bg); display: flex; align-items: center; justify-content: center; padding: 40px 24px; font-family: 'DM Sans', sans-serif; }
+.card { width: 100%; max-width: 420px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 24px; padding: 48px 44px; }
+.title { font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--text-primary); margin: 0 0 4px; }
+.title span { color: var(--accent); }
+.sub { color: var(--text-muted); font-size: 0.85rem; margin: 0 0 32px; font-weight: 300; }
+.error { background: rgba(224,85,85,0.1); border: 1px solid rgba(224,85,85,0.25); color: var(--danger); padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-size: 0.85rem; }
+.form { display: flex; flex-direction: column; gap: 20px; }
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.submitBtn { margin-top: 8px; }
+.footer { margin-top: 28px; text-align: center; color: var(--text-muted); font-size: 0.85rem; }
+.link { color: var(--accent); font-weight: 600; text-decoration: none; }
+.link:hover { text-decoration: underline; }

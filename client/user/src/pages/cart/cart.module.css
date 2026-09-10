@@ -1,0 +1,14 @@
+/* cart.module.css */
+.page { min-height: 100vh; background: var(--bg); padding: 48px 24px; max-width: 900px; margin: 0 auto; }
+.header { margin-bottom: 32px; }
+.title { font-family: 'Playfair Display', serif; font-size: clamp(1.8rem, 3vw, 2.5rem); color: var(--text-primary); margin: 0; }
+.title span { color: var(--accent); }
+.list { display: flex; flex-direction: column; gap: 16px; margin-bottom: 32px; }
+.summary { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius); padding: 24px; }
+.summaryRow { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--card-border); color: var(--text-primary); }
+.summaryRowTotal { font-size: 1.2rem; font-weight: 600; color: var(--accent); border-bottom: none; padding-top: 16px; }
+.checkoutBtn { margin-top: 24px; }
+.continue { text-align: center; margin-top: 16px; }
+.continue a { color: var(--text-muted); font-size: 0.85rem; }
+.continue a:hover { color: var(--accent); }
+.loading { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 50vh; gap: 16px; color: var(--text-muted); }

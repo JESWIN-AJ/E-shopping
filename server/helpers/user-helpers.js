@@ -5,8 +5,8 @@ const { ObjectId } = require('mongodb')
 const Razorpay = require('razorpay');
 
 var instance = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_KEY_SECRET
+    key_id: process.env.RAZORPAY_KEY_ID,
+    key_secret: process.env.RAZORPAY_KEY_SECRET
 });
 
 module.exports = {
@@ -55,7 +55,19 @@ module.exports = {
             }
         })
     },
-    getCartProducts: (userId) => {
+
+
+    getAllproducts: () => {
+        return new Promise(async (resolve, reject) => {
+            let products = await db.get().collection(collection.PRODUCT_COLLECTION).find().toArray();
+            // const plainproducts = JSON.parse(JSON.stringify(products));
+            resolve(products);
+
+        })
+
+    },
+
+     getCartProducts: (userId) => {
 
         return new Promise(async (resolve, reject) => {
             let cartItems = await db.get().collection(collection.CART_COLLECTION).aggregate([
@@ -233,35 +245,35 @@ module.exports = {
 
     },
 
-getCartProlist: (userId) => {
-    return new Promise(async (resolve, reject) => {
-        let cart = await db.get().collection(collection.CART_COLLECTION).aggregate([
-            { $match: { user: new ObjectId(userId) } },
-            { $unwind: '$products' },
-            { $project: { item: '$products.item', quantity: '$products.quantity' } },
-            {
-                $lookup: {
-                    from: collection.PRODUCT_COLLECTION,
-                    localField: 'item',
-                    foreignField: '_id',
-                    as: 'product'
+    getCartProlist: (userId) => {
+        return new Promise(async (resolve, reject) => {
+            let cart = await db.get().collection(collection.CART_COLLECTION).aggregate([
+                { $match: { user: new ObjectId(userId) } },
+                { $unwind: '$products' },
+                { $project: { item: '$products.item', quantity: '$products.quantity' } },
+                {
+                    $lookup: {
+                        from: collection.PRODUCT_COLLECTION,
+                        localField: 'item',
+                        foreignField: '_id',
+                        as: 'product'
+                    }
+                },
+                { $project: { item: 1, quantity: 1, product: { $arrayElemAt: ['$product', 0] } } },
+                {
+                    $project: {
+                        item: 1,
+                        name: '$product.name',
+                        quantity: 1,
+                        price: { $toDouble: '$product.price' },                              // ✅ unit price
+                        total: { $multiply: ['$quantity', { $toDouble: '$product.price' }] } // ✅ item total
+                    }
                 }
-            },
-            { $project: { item: 1, quantity: 1, product: { $arrayElemAt: ['$product', 0] } } },
-            {
-                $project: {
-                    item: 1,
-                    name: '$product.name',
-                    quantity: 1,
-                    price: { $toDouble: '$product.price' },                              // ✅ unit price
-                    total: { $multiply: ['$quantity', { $toDouble: '$product.price' }] } // ✅ item total
-                }
-            }
-        ]).toArray()
+            ]).toArray()
 
-        resolve(cart)
-    })
-},
+            resolve(cart)
+        })
+    },
 
     getUserOrders: (userId) => {
         return new Promise(async (resolve, reject) => {
@@ -270,39 +282,37 @@ getCartProlist: (userId) => {
         })
     },
 
-    genraterazorpay: (orderId,totalpay) => {
+    generateRazorpay: (orderId, totalpay) => {
         return new Promise((resolve, reject) => {
-           var option = {
-            amount:totalpay*100,
-            currency:"INR",
-            receipt:orderId.toString(orderId)
-           };
-           instance.orders.create(option,function(err,order){
-            if(err){
-                console.log(err);
-                reject(err)
-                
-            }else{
-                console.log('New Order:',order);
-                resolve(order)
-            }   
-           });
+            var option = {
+                amount: totalpay * 100,
+                currency: "INR",
+                receipt: orderId.toString(orderId)
+            };
+            instance.orders.create(option, function (err, order) {
+                if (err) {
+                    console.log(err);
+                    reject(err)
+
+                } else {
+                    console.log('New Order:', order);
+                    resolve(order)
+                }
+            });
 
 
         })
     },
-     
-    
+
+
     verifyPayment: (details) => {
         return new Promise((resolve, reject) => {
             const crypto = require('crypto');
-            const hmac = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET);            hmac.update(details["razorpay_order_id"] + '|' + details["razorpay_payment_id"]);
-            hmac = hmac.digest('hex');
-            if (hmac === details["razorpay_signature"]) {
-                resolve()
-            }   else {  
-                reject()
-            }
+            const hmac = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET);
+            hmac.update(details["razorpay_order_id"] + '|' + details["razorpay_payment_id"]);
+            const digest = hmac.digest('hex');
+            if (digest === details["razorpay_signature"]) resolve()
+            else reject()
         })
     },
 
@@ -310,11 +320,11 @@ getCartProlist: (userId) => {
         return new Promise((resolve, reject) => {
             db.get().collection(collection.ORDER_COLLECTION)
                 .updateOne(
-                    { _id: new ObjectId(orderId) },
+                    { _id: new ObjectId(orderId), status: 'pending' },
                     { $set: { status: 'placed' } }
                 ).then(() => {
                     resolve()
-                })  
+                })
         })
     }
 

@@ -1,0 +1,7 @@
+.wrapper { display: flex; flex-direction: column; gap: 6px; }
+.label { font-size: 0.72rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); }
+.textarea { width: 100%; min-height: 100px; resize: vertical; background: var(--input-bg); border: 1px solid var(--card-border); border-radius: 10px; color: var(--text-primary); font: inherit; font-size: 0.9rem; padding: 13px 16px; outline: none; box-sizing: border-box; }
+.textarea:focus { border-color: var(--accent); }
+.error { border-color: var(--danger); }
+.errorText { color: var(--danger); font-size: 0.78rem; }
+.helperText { color: var(--text-muted); font-size: 0.78rem; }

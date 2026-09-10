@@ -1,0 +1,10 @@
+.wrapper { display: flex; flex-direction: column; gap: 6px; }
+.label { font-size: 0.72rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); }
+.inputWrapper { position: relative; }
+.iconLeft { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+.iconRight { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+.input { width: 100%; background: var(--input-bg); border: 1px solid var(--card-border); border-radius: 10px; color: var(--text-primary); font-size: 0.9rem; padding: 13px 16px; outline: none; box-sizing: border-box; }
+.input:focus { border-color: var(--accent); }
+.error { border-color: var(--danger); }
+.errorText { color: var(--danger); font-size: 0.78rem; }
+.helperText { color: var(--text-muted); font-size: 0.78rem; }

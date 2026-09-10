@@ -1,0 +1,33 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 100px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease;
+  cursor: pointer;
+  border: 1px solid transparent;
+  font-family: inherit;
+}
+.primary { background: var(--accent); color: #0d0d0d; }
+.outline { background: transparent; border-color: var(--accent); color: var(--accent); }
+.ghost { background: transparent; color: var(--text-primary); }
+.sm { padding: 6px 14px; font-size: 0.7rem; }
+.md { padding: 10px 20px; font-size: 0.8rem; }
+.lg { padding: 13px 28px; font-size: 0.85rem; }
+.fullWidth { width: 100%; }
+.loading { opacity: 0.7; pointer-events: none; }
+.disabled { opacity: 0.4; cursor: not-allowed; }
+.spinner {
+  width: 14px; height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  display: inline-block;
+  animation: spin 0.5s linear infinite;
+}
+.hidden { visibility: hidden; }
+@keyframes spin { to { transform: rotate(360deg); } }

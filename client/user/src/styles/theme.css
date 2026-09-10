@@ -1,0 +1,16 @@
+:root {
+  --bg: #0d0d0d;
+  --card-bg: #161616;
+  --card-border: #2a2a2a;
+  --accent: #c9a84c;
+  --accent-glow: rgba(201,168,76,0.15);
+  --text-primary: #f0ece4;
+  --text-muted: #7a7570;
+  --input-bg: #1e1e1e;
+  --radius: 16px;
+  --success: #4caf7d;
+  --danger: #e05555;
+  --warning: #e0a135;
+  --font-primary: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}

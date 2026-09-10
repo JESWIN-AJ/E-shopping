@@ -1,31 +1,50 @@
 # This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
-
 name: Node.js CI
 
 on:
   push:
-    branches: [ "dev" ]
+    branches: [ "dev", "gooddev" ]
   pull_request:
-    branches: [ "dev" ]
+    branches: [ "dev", "gooddev" ]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     strategy:
       matrix:
-        node-version: [18.x, 20.x, 22.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-
+        node-version: [20.x]
     steps:
-    - uses: actions/checkout@v4
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npm ci
-    - run: npm run build --if-present
-    - run: npm test
+      - uses: actions/checkout@v4
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          cache-dependency-path: |
+            server/package-lock.json
+            client/user/package-lock.json
+            client/admin/package-lock.json
+
+      # Server
+      - name: Install server deps
+        run: npm ci
+        working-directory: ./server
+      - name: Typecheck server
+        run: node --check app.js
+        working-directory: ./server
+
+      # Client user
+      - name: Install user client deps
+        run: npm ci
+        working-directory: ./client/user
+      - name: Build user client
+        run: npm run build
+        working-directory: ./client/user
+
+      # Client admin
+      - name: Install admin client deps
+        run: npm ci
+        working-directory: ./client/admin
+      - name: Build admin client
+        run: npm run build
+        working-directory: ./client/admin

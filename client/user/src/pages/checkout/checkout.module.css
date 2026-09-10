@@ -1,0 +1,49 @@
+/* checkout.module.css */
+.page { min-height: 100vh; background: var(--bg); padding: 48px 24px; max-width: 700px; margin: 0 auto; }
+.header { margin-bottom: 32px; }
+.title { font-family: 'Playfair Display', serif; font-size: clamp(1.8rem, 3vw, 2.5rem); color: var(--text-primary); margin: 0; }
+.title span { color: var(--accent); }
+.steps { margin-bottom: 32px; }
+.stepIndicator { display: flex; align-items: center; justify-content: center; gap: 0; }
+.step { display: flex; align-items: center; gap: 8px; padding: 0 16px; color: var(--text-muted); font-size: 0.85rem; font-weight: 500; position: relative; }
+.stepNum {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--card-border);
+  color: var(--text-muted);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem; font-weight: 600;
+  transition: background 0.2s, color 0.2s;
+}
+.step.active .stepNum { background: var(--accent); color: #0d0d0d; }
+.step.complete .stepNum { background: var(--success); color: #fff; }
+.stepConnector { width: 60px; height: 2px; background: var(--card-border); margin: 0 -16px; }
+.form { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius); padding: 32px; }
+.stepTitle { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--text-primary); margin: 0 0 24px; }
+.error { background: rgba(224,85,85,0.1); border: 1px solid rgba(224,85,85,0.25); color: var(--danger); padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 0.85rem; }
+.paymentOption { display: block; cursor: pointer; margin-bottom: 16px; }
+.paymentOption input { display: none; }
+.paymentCard {
+  display: flex; align-items: center; gap: 16px;
+  padding: 16px;
+  background: var(--input-bg);
+  border: 2px solid var(--card-border);
+  border-radius: 12px;
+  transition: border-color 0.2s, background 0.2s;
+}
+.paymentOption input:checked + .paymentCard { border-color: var(--accent); background: rgba(201,168,76,0.05); }
+.paymentIcon { font-size: 1.5rem; }
+.paymentCard strong { display: block; color: var(--text-primary); font-size: 0.95rem; margin-bottom: 2px; }
+.paymentCard p { margin: 0; font-size: 0.8rem; color: var(--text-muted); }
+.orderSummary { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--card-border); }
+.orderSummary h3 { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--text-primary); margin: 0 0 16px; }
+.summaryRow { display: flex; justify-content: space-between; padding: 8px 0; color: var(--text-primary); }
+.summaryRowTotal { font-size: 1.1rem; font-weight: 600; color: var(--accent); padding-top: 12px; }
+.placeBtn { margin-top: 24px; }
+.nextBtn { margin-top: 8px; }
+.razorpayStep { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 40vh; gap: 16px; text-align: center; }
+.razorpayNote { color: var(--text-muted); font-size: 0.85rem; max-width: 400px; }
+.backBtn { margin-top: 16px; width: 200px; }
+.loading { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 50vh; gap: 16px; color: var(--text-muted); }
+.retryBtn { background: var(--accent); color: #0d0d0d; border: none; padding: 10px 24px; border-radius: 100px; font-weight: 600; cursor: pointer; }
+.cta { display: inline-block; background: var(--accent); color: #0d0d0d; padding: 12px 28px; border-radius: 100px; font-weight: 600; text-decoration: none; }
