@@ -37,7 +37,7 @@ export const STORAGE_KEYS = {
 } as const
 
 // Razorpay test key (from server .env)
-export const RAZORPAY_KEY_ID = import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_TIWMpMQNYLpmHE'
+export const RAZORPAY_KEY_ID = import.meta.env.VITE_RAZORPAY_KEY_ID ||'rzp_test_SYiWQsxdtf6RlX'
 
 // Order status constants (for UI logic)
 export const ORDER_STATUS = {
