@@ -38,6 +38,8 @@ const allowedOrigins = [
 app.use(cors({
   origin: allowedOrigins,
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'X-CSRF-Token'],
 }));
 
 app.use(express.json());
@@ -65,14 +67,16 @@ app.use((err, req, res, next) => {
 });
 
 // DB connect & listen
-const db = require('./config/connection');
 db.connect((err) => {
   if (err) {
     console.log('Database connection failed:', err);
     process.exit(1);
   }
-  app.listen(process.env.PORT || 5000, () => {
-    console.log('Server running, DB connected');
+
+  const PORT = process.env.PORT || 10000;
+
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server running on port ${PORT}, DB connected`);
   });
 });
 
