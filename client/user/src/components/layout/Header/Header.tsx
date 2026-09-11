@@ -17,7 +17,7 @@ export function Header() {
   return (
     <header className={styles.header}>
       <Link to="/" className={styles.brand}>
-        <span className={styles.brandName}>E-Shop</span>
+        <span className={styles.brandName}>Shop</span>
       </Link>
 
       <nav className={styles.nav}>
@@ -25,22 +25,52 @@ export function Header() {
         {user && (
           <>
             <Link to="/cart" className={styles.cartLink}>
-              Cart
+              CART
               {!loading && cart.products.length > 0 && (
                 <span className={styles.cartCount}>{cart.products.length}</span>
               )}
             </Link>
             <Link to="/orders" className={styles.navLink}>Orders</Link>
             <div className={styles.userMenu}>
-              <span className={styles.userName}>{user.firstname}</span>
-              <button onClick={handleLogout} className={styles.logoutBtn}>Logout</button>
+              <details className={styles.dropdownWrapper}>
+                <summary className={styles.logoutBtn}>MENU</summary>
+                <div className={styles.dropdownMenu}>
+                  <Link to="/profile" className={styles.dropdownItem}>
+                    profile
+                  </Link>
+                  <Link to="/orders" className={styles.dropdownItem}>
+                    Track Order
+                  </Link>
+                  <Link to="/services" className={styles.dropdownItem}>
+                    Our Services
+                  </Link>
+                  <Link to="/support" className={styles.dropdownItem}>
+                    Contact Customer Support
+                  </Link>
+                  <Link to="/privacy-policy" className={styles.dropdownItem}>
+                    Privacy Policy
+                  </Link>
+                  <button onClick={handleLogout} className={styles.dropdownItem}>
+                    Logout
+                  </button>
+                </div>
+              </details>
             </div>
           </>
         )}
         {!user && (
           <div className={styles.authButtons}>
-            <Link to="/login" className={styles.authBtn}>Login</Link>
-            <Link to="/signup" className={styles.authBtnPrimary}>Sign Up</Link>
+            <details className={styles.dropdownWrapper}>
+              <summary className={styles.authBtn}>Sign In</summary>
+              <div className={styles.dropdownMenu}>
+                <Link to="/login" className={styles.dropdownItem}>
+                  Login
+                </Link>
+                <Link to="/signup" className={styles.dropdownItem}>
+                  Sign Up
+                </Link>
+              </div>
+            </details>
           </div>
         )}
       </nav>
