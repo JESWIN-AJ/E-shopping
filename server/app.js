@@ -67,6 +67,8 @@ app.use((err, req, res, next) => {
 });
 
 // DB connect & listen
+const db = require('./config/connection');
+
 db.connect((err) => {
   if (err) {
     console.log('Database connection failed:', err);
