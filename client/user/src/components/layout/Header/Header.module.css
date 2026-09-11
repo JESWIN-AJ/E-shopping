@@ -86,3 +86,53 @@
   transition: background 0.2s, transform 0.15s;
 }
 .authBtnPrimary:hover { transform: scale(1.04); }
+
+
+
+
+.dropdownWrapper {
+  position: relative;
+}
+.dropdownWrapper summary {
+  cursor: pointer;
+  list-style: none;
+}
+.dropdownWrapper summary::-webkit-details-marker {
+  display: none;
+}
+.dropdownMenu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  min-width: 160px;
+  padding: 6px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+}
+.dropdownItem {
+  display: block;
+  width: 100%;
+  text-align: left;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding: 8px 10px;
+  border-radius: 4px;
+  transition: background 0.15s, color 0.15s;
+}
+.dropdownItem:hover {
+  background: var(--card-border);
+  color: var(--accent);
+}
+
+
+.dropdownMenu button.dropdownItem {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+}
