@@ -13,32 +13,55 @@ let csrfToken = null;
 
 const UNSAFE_METHODS = ['post', 'put', 'patch', 'delete'];
 
-api.interceptors.request.use((config) => {
-  if (csrfToken && UNSAFE_METHODS.includes(config.method)) {
-    config.headers['X-CSRF-Token'] = csrfToken;
-  }
-  return config;
-});
+// api.interceptors.request.use((config) => {
+//   if (csrfToken && UNSAFE_METHODS.includes(config.method)) {
+// //     config.headers['X-CSRF-Token'] = csrfToken;
+// //   }
+// //   return config;
+// // });
+
+// api.interceptors.response.use(
+//   (res) => {
+//     const token = res.headers['x-csrf-token'];
+//     if (token) csrfToken = token;
+//     return res;
+//   },
+//   (err) => {
+//     const token = err.response?.headers?.['x-csrf-token'];
+//     if (token) csrfToken = token;
+
+//     if (err.response?.status === 401 || err.response?.status === 403) {
+//       window.location.href = '/login';
+//     }
+//     return Promise.reject(err);
+//   }
+// );
 
 api.interceptors.response.use(
-  (res) => {
-    const token = res.headers['x-csrf-token'];
+  (response) => {
+    const token = response.headers['x-csrf-token'];
+    console.log('[CSRF] received:', token, 'from:', response.config.url);
     if (token) csrfToken = token;
-    return res;
+    return response;
   },
-  (err) => {
+   (err) => {
     const token = err.response?.headers?.['x-csrf-token'];
     if (token) csrfToken = token;
 
     if (err.response?.status === 401 || err.response?.status === 403) {
-      // No more localStorage to clear — the session lives server-side in
-      // Redis and the cookie is httpOnly, so there's nothing for JS to
-      // remove. Just redirect.
       window.location.href = '/login';
     }
     return Promise.reject(err);
   }
 );
+
+api.interceptors.request.use((config) => {
+  if (csrfToken && UNSAFE_METHODS.includes(config.method)) {
+    config.headers['X-CSRF-Token'] = csrfToken;
+  }
+  console.log('[CSRF] sending:', csrfToken, 'method:', config.method, 'url:', config.url);
+  return config;
+});
 
 // Call this once on app load (e.g. in App.jsx's root useEffect), before
 // any admin action that needs a CSRF token can fire.
