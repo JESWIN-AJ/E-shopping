@@ -15,7 +15,7 @@ import AddAdmin from './pages/AddAdmin';
 
 function App() {
   return (
-    <BrowserRouter basename="/admin">
+    <BrowserRouter >
       <AuthProvider>
         <Routes>
           <Route path="/login" element={<Login />} />

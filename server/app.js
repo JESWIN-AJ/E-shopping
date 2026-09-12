@@ -31,7 +31,6 @@ app.use(morgan('dev'));
 // });
 
 
-app.use(helmet());
 
 // Trust proxy (required for secure cookies behind Render proxy)
 app.set('trust proxy', 1);
