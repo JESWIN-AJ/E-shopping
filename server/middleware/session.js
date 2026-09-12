@@ -2,7 +2,7 @@ const session = require('express-session');
 
 const { RedisStore, redis } = require('../config/redis');
 
-const isProduction = process.env.NODE_ENV === 'production';
+// const isProduction = process.env.NODE_ENV === 'production';
 
 const sessionMiddleware = session({
   store: new RedisStore({
