@@ -2,7 +2,6 @@ const session = require('express-session');
 
 const { RedisStore, redis } = require('../config/redis');
 
-// const isProduction = process.env.NODE_ENV === 'production';
 
 const sessionMiddleware = session({
   store: new RedisStore({
@@ -21,12 +20,11 @@ const sessionMiddleware = session({
 
   cookie: {
     httpOnly: true,
-    secure: true,
-    sameSite: 'none',
+    // secure: true,
+    // sameSite: 'none',
 
-    // secure: isProduction,
-
-    // sameSite: isProduction ? 'none' : 'lax',
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
 
     maxAge: 1000 * 60 * 60 * 24 * 7,
 
