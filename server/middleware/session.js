@@ -21,10 +21,12 @@ const sessionMiddleware = session({
 
   cookie: {
     httpOnly: true,
+    secure: true,
+    sameSite: 'none',
 
-    secure: isProduction,
+    // secure: isProduction,
 
-    sameSite: isProduction ? 'none' : 'lax',
+    // sameSite: isProduction ? 'none' : 'lax',
 
     maxAge: 1000 * 60 * 60 * 24 * 7,
 
