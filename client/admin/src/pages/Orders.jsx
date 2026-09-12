@@ -35,28 +35,28 @@ export default function Orders() {
     }
   };
 
-  if (loading) return <p style={{ color: '#7a7570', padding: 60 }}>Loading...</p>;
+  if (loading) return <p style={{ color: '#666666', padding: 60 }}>Loading...</p>;
 
   return (
     <div>
-      <h1 style={styles.title}>Order <span style={{ color: '#c9a84c' }}>Management</span></h1>
+      <h1 style={styles.title}>Order <span style={{ color: '#000000' }}>Management</span></h1>
 
       {error && <div style={styles.error}>{error}</div>}
 
       {groupedOrders.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: 80, color: '#7a7570' }}>
-          <h3 style={{ fontFamily: "'Playfair Display', serif", color: '#f0ece4', marginBottom: 8 }}>No orders yet</h3>
+        <div style={{ textAlign: 'center', padding: 80, color: '#666666' }}>
+          <h3 style={{ fontFamily: "'Playfair Display', serif", color: '#000000', marginBottom: 8 }}>No orders yet</h3>
           <p>Orders will appear here once customers make purchases.</p>
         </div>
       ) : (
         groupedOrders.map((group) => (
           <div key={group.userId} style={styles.card}>
             <div style={styles.cardHeader}>
-              <span><strong style={{ color: '#c9a84c' }}>User ID:</strong> {group.userId}</span>
-              <span><strong style={{ color: '#c9a84c' }}>Contact:</strong> {group.mobile}</span>
+              <span><strong style={{ color: '#000000' }}>User ID:</strong> {group.userId}</span>
+              <span><strong style={{ color: '#000000' }}>Contact:</strong> {group.mobile}</span>
             </div>
             <div style={styles.cardBody}>
-              <p style={styles.address}><strong>Shipping Address:</strong> {group.address}</p>
+              <p style={styles.address}><strong style={{ color: '#111111' }}>Shipping Address:</strong> {group.address}</p>
 
               <div style={styles.tableWrap}>
                 <table style={styles.table}>
@@ -84,20 +84,16 @@ export default function Orders() {
                             ))}
                           </ul>
                         </td>
-                        <td style={{ ...styles.td, color: '#c9a84c' }}>₹{order.totalAmount}</td>
+                        <td style={{ ...styles.td, color: '#000000', fontWeight: 600 }}>₹{order.totalAmount}</td>
                         <td style={styles.td}>
                           <span style={styles.paymentBadge}>{order.paymentmethod}</span>
                         </td>
                         <td style={styles.td}>
                           <span style={{
                             ...styles.statusBadge,
-                            background: order.status === 'shipped'
-                              ? 'rgba(46,125,50,0.15)'
-                              : 'rgba(184,134,11,0.15)',
-                            color: order.status === 'shipped' ? '#4caf50' : '#cddc39',
-                            borderColor: order.status === 'shipped'
-                              ? 'rgba(46,125,50,0.3)'
-                              : 'rgba(184,134,11,0.3)',
+                            background: order.status === 'shipped' ? '#000000' : '#ffffff',
+                            color: order.status === 'shipped' ? '#ffffff' : '#333333',
+                            borderColor: '#000000',
                           }}>
                             {order.status}
                           </span>
@@ -129,19 +125,19 @@ export default function Orders() {
 }
 
 const styles = {
-  title: { fontFamily: "'Playfair Display', serif", fontSize: 'clamp(1.6rem, 3vw, 2.2rem)', color: '#f0ece4', marginBottom: 32 },
-  error: { background: 'rgba(220,60,60,0.1)', border: '1px solid rgba(220,60,60,0.25)', color: '#e05555', padding: '12px 16px', borderRadius: 8, marginBottom: 20, textAlign: 'center', fontSize: '0.85rem' },
-  card: { background: '#161616', border: '1px solid #2a2a2a', borderRadius: 16, marginBottom: 32, overflow: 'hidden' },
-  cardHeader: { background: '#1f1b1b', padding: '16px 24px', borderBottom: '1px solid #2a2a2a', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8, color: '#f0ece4', fontSize: '0.85rem' },
+  title: { fontFamily: "'Playfair Display', serif", fontSize: 'clamp(1.6rem, 3vw, 2.2rem)', color: '#000000', marginBottom: 32 },
+  error: { background: '#fbe9e9', border: '1px solid #a30000', color: '#a30000', padding: '12px 16px', borderRadius: 8, marginBottom: 20, textAlign: 'center', fontSize: '0.85rem' },
+  card: { background: '#ffffff', border: '1px solid #000000', borderRadius: 16, marginBottom: 32, overflow: 'hidden' },
+  cardHeader: { background: '#f5f5f5', padding: '16px 24px', borderBottom: '1px solid #000000', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8, color: '#111111', fontSize: '0.85rem' },
   cardBody: { padding: 24 },
-  address: { color: '#7a7570', fontSize: '0.85rem', margin: '0 0 20px', lineHeight: 1.5 },
-  tableWrap: { background: '#161616', border: '1px solid #2a2a2a', borderRadius: 12, overflow: 'auto' },
+  address: { color: '#666666', fontSize: '0.85rem', margin: '0 0 20px', lineHeight: 1.5 },
+  tableWrap: { background: '#ffffff', border: '1px solid #cccccc', borderRadius: 12, overflow: 'auto' },
   table: { width: '100%', borderCollapse: 'collapse', minWidth: 550 },
-  th: { padding: '14px 18px', fontSize: '0.7rem', fontWeight: 500, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#7a7570', textAlign: 'left', borderBottom: '1px solid #2a2a2a', background: '#1f1b1b', whiteSpace: 'nowrap' },
-  tr: { borderBottom: '1px solid #2a2a2a' },
-  td: { padding: '14px 18px', color: '#f0ece4', fontSize: '0.85rem', verticalAlign: 'middle' },
-  qtyBadge: { background: 'rgba(205,218,156,0.15)', color: '#cdda9c', fontSize: '0.7rem', padding: '2px 8px', borderRadius: 100, marginLeft: 4 },
-  paymentBadge: { background: 'rgba(201,168,76,0.1)', border: '1px solid rgba(201,168,76,0.25)', color: '#c9a84c', fontSize: '0.7rem', fontWeight: 500, letterSpacing: '0.08em', textTransform: 'uppercase', padding: '4px 10px', borderRadius: 100, whiteSpace: 'nowrap' },
-  statusBadge: { fontSize: '0.7rem', fontWeight: 500, letterSpacing: '0.08em', textTransform: 'uppercase', padding: '4px 10px', borderRadius: 100, whiteSpace: 'nowrap', border: '1px solid' },
-  shipBtn: { background: 'rgba(201,168,76,0.1)', border: '1px solid rgba(201,168,76,0.3)', color: '#c9a84c', borderRadius: 8, padding: '7px 14px', fontSize: '0.75rem', whiteSpace: 'nowrap' },
+  th: { padding: '14px 18px', fontSize: '0.7rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#333333', textAlign: 'left', borderBottom: '1px solid #000000', background: '#f5f5f5', whiteSpace: 'nowrap' },
+  tr: { borderBottom: '1px solid #e0e0e0' },
+  td: { padding: '14px 18px', color: '#111111', fontSize: '0.85rem', verticalAlign: 'middle' },
+  qtyBadge: { background: '#f0f0f0', color: '#333333', fontSize: '0.7rem', padding: '2px 8px', borderRadius: 100, marginLeft: 4, border: '1px solid #cccccc' },
+  paymentBadge: { background: '#f5f5f5', border: '1px solid #999999', color: '#111111', fontSize: '0.7rem', fontWeight: 500, letterSpacing: '0.08em', textTransform: 'uppercase', padding: '4px 10px', borderRadius: 100, whiteSpace: 'nowrap' },
+  statusBadge: { fontSize: '0.7rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', padding: '4px 10px', borderRadius: 100, whiteSpace: 'nowrap', border: '1px solid' },
+  shipBtn: { background: '#ffffff', border: '1px solid #000000', color: '#000000', borderRadius: 8, padding: '7px 14px', fontSize: '0.75rem', whiteSpace: 'nowrap' },
 };

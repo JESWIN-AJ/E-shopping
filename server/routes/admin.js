@@ -4,13 +4,41 @@ var router = express.Router();
 var productHelpers = require('../helpers/product-helpers');
 var adminAuth = require('../auth/adminauth');
 const { requireAdmin } = require('../middleware/authSession');
- 
+const { loginLimiter } = require('../middleware/rateLimit');
+const validateObjectId = require('../middleware/validateObjectId');
+const {
+  adminLoginSchema,
+  validate
+} = require('../middleware/validation');
+
 
 // POST /admin/login
-router.post('/login', (req, res) => {
-  adminAuth.doLogin(req.body)
+router.post('/login', loginLimiter, validate(adminLoginSchema), (req, res) => {
+  adminAuth.doLogin(req, res)
     .then((response) => res.json(response))
-    .catch((err) => res.status(500).json({ error: 'Login failed' }));
+    .catch((err) => {
+      console.error('Admin login error:', err);
+      res.status(500).json({ error: 'Login failed' });
+    });
+});
+
+
+router.post('/logout', requireAdmin, (req, res) => {
+  adminAuth.doLogout(req, res)
+    .then((response) => res.json(response))
+    .catch((err) => {
+      console.error('Admin logout error:', err);
+      res.status(500).json({ error: 'Logout failed' });
+    });
+});
+
+router.get('/me', (req, res) => {
+  adminAuth.getMe(req)
+    .then((response) => res.json(response))
+    .catch((err) => {
+      console.error('Admin session check error:', err);
+      res.status(500).json({ error: 'Failed to check authentication' });
+    });
 });
 
 // POST /admin/add-admin
@@ -24,11 +52,25 @@ router.post('/add-admin', (req, res) => {
 router.get('/', requireAdmin, (req, res) => {
   productHelpers.getAllproducts()
     .then((products) => res.json({ products }))
-    .catch((err) => res.status(500).json({ error: 'Failed to fetch products' }));
+    .catch((err) => {
+      console.error('Add admin error:', err);
+
+      if (err.code === 11000) {
+        return res.status(409).json({
+          error: 'Admin email already registered'
+        });
+      }
+
+      return res.status(500).json({
+        error: 'Failed to add admin'
+      });
+    });
 });
 
 // POST /admin/add-product
 const { uploadImage } = require('../helpers/cloudinary'); // adjust path to wherever this file actually lives
+
+const { validateImageFile } = require('../helpers/validateImage');
 
 router.post('/add-product', requireAdmin, async (req, res) => {
   try {
@@ -36,7 +78,14 @@ router.post('/add-product', requireAdmin, async (req, res) => {
     let imageUrl = '';
 
     if (req.files && req.files.image) {
-      const result = await uploadImage(req.files.image, id);
+      const file = Array.isArray(req.files.image) ? req.files.image[0] : req.files.image;
+
+      const check = await validateImageFile(file);
+      if (!check.valid) {
+        return res.status(400).json({ error: check.error });
+      }
+
+      const result = await uploadImage(file, id);
       imageUrl = result.secure_url;
       await productHelpers.updateProductImage(id, imageUrl);
     }
@@ -48,32 +97,43 @@ router.post('/add-product', requireAdmin, async (req, res) => {
   }
 });
 
+
 // DELETE /admin/delete-product/:id
-router.delete('/delete-product/:id', requireAdmin, (req, res) => {
+router.delete('/delete-product/:id', requireAdmin, validateObjectId('id'), (req, res) => {
   productHelpers.deleteproduct(req.params.id)
     .then(() => res.json({ status: true }))
     .catch((err) => res.status(500).json({ error: 'Failed to delete product' }));
-});  
+});
 
 // GET /admin/edit-product/:id
-router.get('/edit-product/:id', requireAdmin , (req, res) => {
+router.get('/edit-product/:id', validateObjectId('id'), requireAdmin, (req, res) => {
   productHelpers.getProductDetails(req.params.id)
     .then((product) => res.json({ product }))
     .catch((err) => res.status(500).json({ error: 'Failed to fetch product' }));
 });
 
 
-router.put('/edit-product/:id', requireAdmin, async (req, res) => {
+router.put('/edit-product/:id', requireAdmin, validateObjectId('id'), async (req, res) => {
   try {
     let imageUrl = '';
+
     if (req.files && req.files.image) {
-      const result = await uploadImage(req.files.image, req.params.id);
+      const file = Array.isArray(req.files.image) ? req.files.image[0] : req.files.image;
+
+      const check = await validateImageFile(file);
+      if (!check.valid) {
+        return res.status(400).json({ error: check.error });
+      }
+
+      const result = await uploadImage(file, req.params.id, check.mime);
       imageUrl = result.secure_url;
-      req.body.image = imageUrl;   // ← add image URL to update payload
+      req.body.image = imageUrl;
     }
+
     await productHelpers.updateProduct(req.params.id, req.body);
     res.json({ status: true, image: imageUrl });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: 'Failed to update product' });
   }
 });

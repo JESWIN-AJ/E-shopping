@@ -1,0 +1,217 @@
+/* ===== Layout shell ===== */
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #ffffff;
+  color: #111111;
+  font-family: 'DM Sans', sans-serif;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* ===== Sidebar ===== */
+.admin-sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  background: #ffffff;
+  border-right: 1px solid #000000;
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.28s ease;
+  z-index: 100;
+}
+
+.admin-brand {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  margin-bottom: 32px;
+  color: #111111;
+}
+
+.admin-accent {
+  color: #111111;
+}
+
+.admin-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.admin-link {
+  color: #333333;
+  text-decoration: none;
+  padding: 10px 14px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  transition: 0.2s;
+}
+
+.admin-link:hover {
+  border-color: #000000;
+  background: #f5f5f5;
+}
+
+.admin-link.active {
+  background: #000000;
+  color: #ffffff;
+  border-color: #000000;
+}
+
+.admin-bottom {
+  border-top: 1px solid #000000;
+  padding-top: 16px;
+  margin-top: 16px;
+}
+
+.admin-name {
+  font-size: 0.8rem;
+  color: #333333;
+  display: block;
+  margin-bottom: 8px;
+  word-break: break-all;
+}
+
+.admin-logout-btn {
+  background: #ffffff;
+  border: 1px solid #000000;
+  color: #000000;
+  border-radius: 100px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 600;
+  width: 100%;
+  transition: 0.2s;
+}
+
+.admin-logout-btn:hover {
+  background: #000000;
+  color: #ffffff;
+}
+
+/* ===== Main content ===== */
+.admin-main {
+  flex: 1;
+  min-width: 0;
+  padding: 24px;
+  overflow-x: hidden;
+  background: #ffffff;
+}
+
+/* ===== Toggle button (hamburger) — hidden on desktop ===== */
+.sidebar-toggle {
+  display: none;
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 200;
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid #000000;
+  cursor: pointer;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.sidebar-toggle span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: #000000;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.sidebar-toggle.open span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+.sidebar-toggle.open span:nth-child(2) {
+  opacity: 0;
+}
+.sidebar-toggle.open span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* ===== Overlay backdrop for mobile/tablet ===== */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 90;
+}
+
+/* ===== Tablet & Mobile (<= 1024px): sidebar becomes an off-canvas drawer ===== */
+@media (max-width: 1024px) {
+  .sidebar-toggle {
+    display: flex;
+  }
+
+  .admin-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    transform: translateX(-100%);
+    box-shadow: none;
+  }
+
+  .admin-sidebar.sidebar-open {
+    transform: translateX(0);
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
+  }
+
+  .sidebar-overlay {
+    display: block;
+  }
+
+  .admin-main {
+    width: 100%;
+    padding: 24px 16px 16px;
+    padding-top: 72px;
+  }
+}
+
+/* ===== Tablet refinement (601px - 1024px) ===== */
+@media (min-width: 601px) and (max-width: 1024px) {
+  .admin-sidebar {
+    width: 260px;
+  }
+
+  .admin-main {
+    padding: 24px 32px 24px;
+    padding-top: 76px;
+  }
+}
+
+/* ===== Small mobile (<= 480px) ===== */
+@media (max-width: 480px) {
+  .admin-sidebar {
+    width: 78vw;
+    max-width: 280px;
+    padding: 20px 14px;
+  }
+
+  .admin-brand {
+    font-size: 1.05rem;
+    margin-bottom: 24px;
+  }
+
+  .admin-main {
+    padding: 16px 12px;
+    padding-top: 68px;
+  }
+
+  .admin-logout-btn {
+    padding: 10px 16px;
+  }
+}

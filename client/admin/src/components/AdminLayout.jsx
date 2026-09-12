@@ -1,49 +1,101 @@
+import { useState, useRef, useEffect } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import './AdminLayout.css';
 
 export default function AdminLayout() {
   const { admin, logout } = useAuth();
   const location = useLocation();
 
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const touchStartX = useRef(null);
+  const touchCurrentX = useRef(null);
+
   const isActive = (path) =>
     location.pathname === path ? 'active' : '';
 
+  // Close sidebar automatically on route change (mobile/tablet)
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [location.pathname]);
+
+  // Swipe handling: swipe right from left edge to open, swipe left to close
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchCurrentX.current = touchStartX.current;
+  };
+
+  const handleTouchMove = (e) => {
+    touchCurrentX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    if (touchStartX.current === null || touchCurrentX.current === null) return;
+    const delta = touchCurrentX.current - touchStartX.current;
+
+    // Opening: swipe starting near left edge, moving right
+    if (!sidebarOpen && touchStartX.current < 40 && delta > 60) {
+      setSidebarOpen(true);
+    }
+    // Closing: swipe left while open
+    if (sidebarOpen && delta < -60) {
+      setSidebarOpen(false);
+    }
+
+    touchStartX.current = null;
+    touchCurrentX.current = null;
+  };
+
   return (
-    <div style={styles.layout}>
+    <div
+      className="admin-layout"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
+      {/* Toggle button — visible on tablet/mobile */}
+      <button
+        className={`sidebar-toggle ${sidebarOpen ? 'open' : ''}`}
+        onClick={() => setSidebarOpen((prev) => !prev)}
+        aria-label="Toggle sidebar"
+        aria-expanded={sidebarOpen}
+      >
+        <span />
+        <span />
+        <span />
+      </button>
+
+      {/* Backdrop overlay for mobile/tablet when sidebar is open */}
+      {sidebarOpen && (
+        <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />
+      )}
+
       {/* Sidebar */}
-      <aside style={styles.sidebar}>
-        <h2 style={styles.brand}>E-SHOP<span style={styles.accent}>.</span>ADMIN</h2>
-        <nav style={styles.nav}>
+      <aside className={`admin-sidebar ${sidebarOpen ? 'sidebar-open' : ''}`}>
+        <div>
+        <h2 className="admin-brand">
+          SHOP<span className="admin-accent">-</span>ADMIN
+        </h2>
 
-
-          <Link to="/" className={isActive('/')} style={styles.link}>Products</Link>
-          <Link to="/products/add" className={isActive('/products/add')} style={styles.link}>+ Add Product</Link>
-          <Link to="/orders" className={isActive('/orders')} style={styles.link}>Orders</Link>
-          <Link to="/users" className={isActive('/users')} style={styles.link}>Users</Link>
-          <Link to="/admins" className={isActive('/admins')} style={styles.link}>Admins</Link>
+        <nav className="admin-nav">
+          <Link to="/" className={`admin-link ${isActive('/')}`}>Products</Link>
+          <Link to="/products/add" className={`admin-link ${isActive('/products/add')}`}>+ Add Product</Link>
+          <Link to="/orders" className={`admin-link ${isActive('/orders')}`}>Orders</Link>
+          <Link to="/users" className={`admin-link ${isActive('/users')}`}>Users</Link>
+          <Link to="/admins" className={`admin-link ${isActive('/admins')}`}>Admins</Link>
         </nav>
-        <div style={styles.bottom}>
-          <span style={styles.adminName}>{admin?.email}</span>
-          <button onClick={logout} style={styles.logoutBtn}>Logout</button>
+
+        <div className="admin-bottom">
+          <span className="admin-name">{admin?.email}</span>
+          <button onClick={logout} className="admin-logout-btn">Logout</button>
+        </div>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main style={styles.main}>
+      <main className="admin-main">
         <Outlet />
       </main>
     </div>
   );
 }
-
-const styles = {
-  layout: { display: 'flex', minHeight: '100vh', background: '#0d0d0d', color: '#f0ece4', fontFamily: "'DM Sans', sans-serif" },
-  sidebar: { width: 220, background: '#161616', borderRight: '1px solid #2a2a2a', padding: '24px 16px', display: 'flex', flexDirection: 'column' },
-  brand: { fontFamily: "'Playfair Display', serif", fontSize: '1.2rem', marginBottom: 32, color: '#f0ece4' },
-  accent: { color: '#c9a84c' },
-  nav: { display: 'flex', flexDirection: 'column', gap: 4, flex: 1 },
-  link: { color: '#7a7570', textDecoration: 'none', padding: '10px 14px', borderRadius: 8, fontSize: '0.85rem', transition: '0.2s' },
-  bottom: { borderTop: '1px solid #2a2a2a', paddingTop: 16, marginTop: 16 },
-  adminName: { fontSize: '0.8rem', color: '#7a7570', display: 'block', marginBottom: 8 },
-  logoutBtn: { background: 'transparent', border: '1px solid #2a2a2a', color: '#e05555', borderRadius: 100, padding: '8px 16px', cursor: 'pointer', fontSize: '0.78rem', width: '100%' },
-};

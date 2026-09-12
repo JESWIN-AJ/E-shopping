@@ -67,7 +67,7 @@ module.exports = {
 
     },
 
-     getCartProducts: (userId) => {
+    getCartProducts: (userId) => {
 
         return new Promise(async (resolve, reject) => {
             let cartItems = await db.get().collection(collection.CART_COLLECTION).aggregate([
@@ -287,23 +287,21 @@ module.exports = {
             var option = {
                 amount: totalpay * 100,
                 currency: "INR",
-                receipt: orderId.toString(orderId)
+                receipt: orderId.toString()
             };
-            instance.orders.create(option, function (err, order) {
-                if (err) {
-                    console.log(err);
-                    reject(err)
+            instance.orders.create(option, async function (err, order) {
+                if (err) return reject(err);
 
-                } else {
-                    console.log('New Order:', order);
-                    resolve(order)
-                }
+                // Link the Razorpay order to this Mongo order for later verification
+                await db.get().collection(collection.ORDER_COLLECTION).updateOne(
+                    { _id: new ObjectId(orderId) },
+                    { $set: { razorpayOrderId: order.id } }
+                );
+
+                resolve(order);
             });
-
-
-        })
+        });
     },
-
 
     verifyPayment: (details) => {
         return new Promise((resolve, reject) => {
@@ -311,23 +309,35 @@ module.exports = {
             const hmac = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET);
             hmac.update(details["razorpay_order_id"] + '|' + details["razorpay_payment_id"]);
             const digest = hmac.digest('hex');
-            if (digest === details["razorpay_signature"]) resolve()
-            else reject()
-        })
+
+            const expected = Buffer.from(digest, 'hex');
+            const received = Buffer.from(details["razorpay_signature"] || '', 'hex');
+
+            if (expected.length === received.length && crypto.timingSafeEqual(expected, received)) {
+                resolve();
+            } else {
+                reject();
+            }
+        });
     },
 
-    changePaymentStatus: (orderId) => {
+    
+    changePaymentStatus: (orderId, razorpayOrderId) => {
         return new Promise((resolve, reject) => {
             db.get().collection(collection.ORDER_COLLECTION)
                 .updateOne(
-                    { _id: new ObjectId(orderId), status: 'pending' },
+                    { _id: new ObjectId(orderId), status: 'pending', razorpayOrderId: razorpayOrderId },
                     { $set: { status: 'placed' } }
-                ).then(() => {
-                    resolve()
+                )
+                .then((result) => {
+                    if (result.matchedCount === 0) {
+                        return reject(new Error('Order/payment mismatch'));
+                    }
+                    resolve();
                 })
-        })
-    }
-
+                .catch(reject);
+        });
+    },
 
 
 

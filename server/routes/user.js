@@ -3,6 +3,11 @@ const router = express.Router();
 const userHelpers = require('../helpers/user-helpers');
 const userAuth = require('../auth/userauth');
 const { requireUser } = require('../middleware/authSession');
+const { loginLimiter } = require('../middleware/rateLimit');
+const {
+  signupSchema,
+  validate
+} = require('../middleware/validation');
 
 
 // Get CSRF token
@@ -13,11 +18,11 @@ router.get('/csrf-token', (req, res) => {
 });
 
 // Cookie-based auth routes
-router.post('/login', (req, res) => {
+router.post('/login', loginLimiter, (req, res) => {
   userAuth.doLogin(req, res).then((response) => res.json(response));
 });
 
-router.post('/signup', (req, res) => {
+router.post('/signup', loginLimiter, validate(signupSchema), (req, res) => {
   userAuth.doSignup(req, res).then((response) => res.json(response));
 });
 
@@ -115,7 +120,10 @@ router.get('/order-success', requireUser, async (req, res) => {
 
 router.post('/verify-payment', requireUser, (req, res) => {
   userHelpers.verifyPayment(req.body)
-    .then(() => userHelpers.changePaymentStatus(req.body.orderId || req.body['order[receipt]']))
+    .then(() => userHelpers.changePaymentStatus(
+      req.body.orderId || req.body['order[receipt]'],
+      req.body.razorpay_order_id
+    ))
     .then(() => res.json({ status: true }))
     .catch((err) => res.status(400).json({ status: false, error: 'Payment verification failed' }));
 });

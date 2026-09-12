@@ -31,12 +31,12 @@ export default function Products() {
     }
   };
 
-  if (loading) return <p style={{ color: '#7a7570' }}>Loading...</p>;
+  if (loading) return <p style={{ color: '#666666' }}>Loading...</p>;
 
   return (
     <div>
       <div style={styles.header}>
-        <h1 style={styles.title}>Product <span style={{ color: '#c9a84c' }}>Management</span></h1>
+        <h1 style={styles.title}>Product <span style={{ color: '#000000' }}>Management</span></h1>
         <Link to="/products/add" style={styles.addBtn}>+ Add Product</Link>
       </div>
 
@@ -59,15 +59,15 @@ export default function Products() {
                   {p.image ? (
                     <img src={p.image} alt={p.name} style={styles.thumb} />
                   ) : (
-                    <div style={{ ...styles.thumb, background: '#1e1e1e' }} />
+                    <div style={{ ...styles.thumb, background: '#e5e5e5' }} />
                   )}
                 </td>
                 <td style={{ ...styles.td, fontFamily: "'Playfair Display', serif", fontWeight: 600 }}>{p.name}</td>
                 <td style={styles.td}><span style={styles.badge}>{p.category}</span></td>
-                <td style={{ ...styles.td, color: '#c9a84c' }}>₹{p.price}</td>
-                <td style={{ ...styles.td, color: '#7a7570', fontSize: '0.82rem' }}>{p.description}</td>
+                <td style={{ ...styles.td, color: '#000000', fontWeight: 600 }}>₹{p.price}</td>
+                <td style={{ ...styles.td, color: '#666666', fontSize: '0.82rem' }}>{p.description}</td>
                 <td style={styles.td}>
-                  <div style={{ display: 'flex', gap: 8 }}>
+                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                     <Link to={`/products/${p._id}/edit`} style={styles.editBtn}>Edit</Link>
                     <button onClick={() => handleDelete(p._id, p.name)} style={styles.deleteBtn}>Delete</button>
                   </div>
@@ -75,7 +75,7 @@ export default function Products() {
               </tr>
             ))}
             {products.length === 0 && (
-              <tr><td colSpan={6} style={{ ...styles.td, textAlign: 'center', color: '#7a7570', padding: 60 }}>No products found</td></tr>
+              <tr><td colSpan={6} style={{ ...styles.td, textAlign: 'center', color: '#666666', padding: 60 }}>No products found</td></tr>
             )}
           </tbody>
         </table>
@@ -86,15 +86,15 @@ export default function Products() {
 
 const styles = {
   header: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32, flexWrap: 'wrap', gap: 16 },
-  title: { fontFamily: "'Playfair Display', serif", fontSize: 'clamp(1.6rem, 3vw, 2.2rem)', color: '#f0ece4', margin: 0 },
-  addBtn: { background: '#c9a84c', color: '#0d0d0d', border: 'none', borderRadius: 100, padding: '10px 24px', fontSize: '0.8rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', textDecoration: 'none', whiteSpace: 'nowrap' },
-  tableWrap: { background: '#161616', border: '1px solid #2a2a2a', borderRadius: 16, overflow: 'auto' },
+  title: { fontFamily: "'Playfair Display', serif", fontSize: 'clamp(1.6rem, 3vw, 2.2rem)', color: '#000000', margin: 0 },
+  addBtn: { background: '#000000', color: '#ffffff', border: '1px solid #000000', borderRadius: 100, padding: '10px 24px', fontSize: '0.8rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', textDecoration: 'none', whiteSpace: 'nowrap' },
+  tableWrap: { background: '#ffffff', border: '1px solid #000000', borderRadius: 16, overflow: 'auto' },
   table: { width: '100%', borderCollapse: 'collapse', minWidth: 600 },
-  th: { padding: '16px 20px', fontSize: '0.7rem', fontWeight: 500, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#7a7570', textAlign: 'left', borderBottom: '1px solid #2a2a2a', background: '#1f1b1b' },
-  tr: { borderBottom: '1px solid #2a2a2a', transition: '0.2s' },
-  td: { padding: '16px 20px', color: '#f0ece4', fontSize: '0.88rem', verticalAlign: 'middle' },
-  thumb: { width: 52, height: 52, borderRadius: 10, objectFit: 'cover', border: '1px solid #2a2a2a' },
-  badge: { background: 'rgba(201,168,76,0.1)', border: '1px solid rgba(201,168,76,0.25)', color: '#c9a84c', fontSize: '0.7rem', fontWeight: 500, letterSpacing: '0.08em', textTransform: 'uppercase', padding: '4px 10px', borderRadius: 100, whiteSpace: 'nowrap' },
-  editBtn: { background: 'rgba(201,168,76,0.1)', border: '1px solid rgba(201,168,76,0.3)', color: '#c9a84c', borderRadius: 8, padding: '7px 14px', fontSize: '0.75rem', cursor: 'pointer', textDecoration: 'none' },
-  deleteBtn: { background: 'rgba(220,60,60,0.1)', border: '1px solid rgba(220,60,60,0.25)', color: '#e05555', borderRadius: 8, padding: '7px 14px', fontSize: '0.75rem', cursor: 'pointer' },
+  th: { padding: '16px 20px', fontSize: '0.7rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#333333', textAlign: 'left', borderBottom: '1px solid #000000', background: '#f5f5f5' },
+  tr: { borderBottom: '1px solid #d9d9d9', transition: '0.2s' },
+  td: { padding: '16px 20px', color: '#111111', fontSize: '0.88rem', verticalAlign: 'middle' },
+  thumb: { width: 52, height: 52, borderRadius: 10, objectFit: 'cover', border: '1px solid #d9d9d9' },
+  badge: { background: '#f0f0f0', border: '1px solid #cccccc', color: '#111111', fontSize: '0.7rem', fontWeight: 500, letterSpacing: '0.08em', textTransform: 'uppercase', padding: '4px 10px', borderRadius: 100, whiteSpace: 'nowrap' },
+  editBtn: { background: '#ffffff', border: '1px solid #000000', color: '#000000', borderRadius: 8, padding: '7px 14px', fontSize: '0.75rem', cursor: 'pointer', textDecoration: 'none' },
+  deleteBtn: { background: '#ffffff', border: '1px solid #a30000', color: '#a30000', borderRadius: 8, padding: '7px 14px', fontSize: '0.75rem', cursor: 'pointer' },
 };

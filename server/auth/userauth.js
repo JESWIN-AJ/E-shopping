@@ -28,6 +28,19 @@ module.exports = {
     return new Promise(async (resolve, reject) => {
       try {
         const { firstname, lastname, email, phone, password } = req.body;
+
+        const existingUser = await db
+          .get()
+          .collection(collection.USER_COLLECTION)
+          .findOne({ email });
+
+        if (existingUser) {
+          return resolve({
+            status: false,
+            error: 'Email already registered'
+          });
+        }
+
         const hashed = await bcrypt.hash(password, 10);
         const result = await db.get().collection(collection.USER_COLLECTION).insertOne({
           firstname, lastname, email, phone, password: hashed
@@ -63,6 +76,6 @@ module.exports = {
     });
   },
 
-   
-  
+
+
 };

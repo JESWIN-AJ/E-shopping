@@ -19,11 +19,11 @@ export default function Users() {
     }
   };
 
-  if (loading) return <p style={{ color: '#7a7570', padding: 60 }}>Loading...</p>;
+  if (loading) return <p style={{ color: '#666666', padding: 60 }}>Loading...</p>;
 
   return (
     <div>
-      <h1 style={styles.title}>User <span style={{ color: '#c9a84c' }}>Management</span></h1>
+      <h1 style={styles.title}>User <span style={{ color: '#000000' }}>Management</span></h1>
 
       {error && <div style={styles.error}>{error}</div>}
 
@@ -48,7 +48,7 @@ export default function Users() {
             ))}
             {users.length === 0 && (
               <tr>
-                <td colSpan={3} style={{ ...styles.td, textAlign: 'center', color: '#7a7570', padding: 60 }}>
+                <td colSpan={3} style={{ ...styles.td, textAlign: 'center', color: '#666666', padding: 60 }}>
                   No users found
                 </td>
               </tr>
@@ -61,11 +61,11 @@ export default function Users() {
 }
 
 const styles = {
-  title: { fontFamily: "'Playfair Display', serif", fontSize: 'clamp(1.6rem, 3vw, 2.2rem)', color: '#f0ece4', marginBottom: 32 },
-  error: { background: 'rgba(220,60,60,0.1)', border: '1px solid rgba(220,60,60,0.25)', color: '#e05555', padding: '12px 16px', borderRadius: 8, marginBottom: 20, textAlign: 'center', fontSize: '0.85rem' },
-  tableWrap: { background: '#161616', border: '1px solid #2a2a2a', borderRadius: 16, overflow: 'auto' },
+  title: { fontFamily: "'Playfair Display', serif", fontSize: 'clamp(1.6rem, 3vw, 2.2rem)', color: '#000000', marginBottom: 32 },
+  error: { background: '#fbe9e9', border: '1px solid #a30000', color: '#a30000', padding: '12px 16px', borderRadius: 8, marginBottom: 20, textAlign: 'center', fontSize: '0.85rem' },
+  tableWrap: { background: '#ffffff', border: '1px solid #000000', borderRadius: 16, overflow: 'auto' },
   table: { width: '100%', borderCollapse: 'collapse', minWidth: 500 },
-  th: { padding: '16px 20px', fontSize: '0.7rem', fontWeight: 500, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#7a7570', textAlign: 'left', borderBottom: '1px solid #2a2a2a', background: '#1f1b1b' },
-  tr: { borderBottom: '1px solid #2a2a2a', transition: '0.2s' },
-  td: { padding: '16px 20px', color: '#f0ece4', fontSize: '0.88rem', verticalAlign: 'middle' },
+  th: { padding: '16px 20px', fontSize: '0.7rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#333333', textAlign: 'left', borderBottom: '1px solid #000000', background: '#f5f5f5' },
+  tr: { borderBottom: '1px solid #d9d9d9', transition: '0.2s' },
+  td: { padding: '16px 20px', color: '#111111', fontSize: '0.88rem', verticalAlign: 'middle' },
 };

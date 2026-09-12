@@ -6,26 +6,32 @@ const cors = require('cors');
 const sessionMiddleware = require('./middleware/session');
 const { csrfProtection, csrfHeader } = require('./middleware/csrf');
 const morgan = require('morgan');
+const helmet = require('helmet');
+
 const app = express();
+
+
+app.use(helmet());
 
 app.use(morgan('dev'));
 
 
 
 
-app.use((req, res, next) => {
-  console.log('=================================');
-  console.log('REQUEST RECEIVED');
-  console.log('Method:', req.method);
-  console.log('URL:', req.originalUrl);
-  console.log('Origin:', req.headers.origin);
-  console.log('Cookies:', req.headers.cookie);
-  console.log('=================================');
+// app.use((req, res, next) => {
+//   console.log('=================================');
+//   console.log('REQUEST RECEIVED');
+//   console.log('Method:', req.method);
+//   console.log('URL:', req.originalUrl);
+//   console.log('Origin:', req.headers.origin);
+//   console.log('Cookies:', req.headers.cookie);
+//   console.log('=================================');
 
-  next();
-});
+//   next();
+// });
 
 
+app.use(helmet());
 
 // Trust proxy (required for secure cookies behind Render proxy)
 app.set('trust proxy', 1);
@@ -40,6 +46,7 @@ app.use(cors({
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'X-CSRF-Token'],
+  exposedHeaders: ['X-CSRF-Token'], 
 }));
 
 app.use(express.json());
@@ -51,6 +58,18 @@ app.use(csrfHeader);  // Exposes x-csrf-token header
 
 // Static files
 app.use('/product-images', express.static(path.join(__dirname, '..', 'public', 'product-images')));
+
+
+const fileUpload = require('express-fileupload');
+
+app.use(fileUpload({
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB cap
+  abortOnLimit: true,
+  useTempFiles: false,
+  safeFileNames: true,
+  preserveExtension: 4,
+}));
+
 
 // Routes
 const userRouter = require('./routes/user');
@@ -64,6 +83,23 @@ app.use((err, req, res, next) => {
     return res.status(403).json({ error: 'Invalid CSRF token' });
   }
   next(err);
+});
+app.use((req, res) => {
+  res.status(404).json({ error: 'Not found' });
+});
+
+app.use((err, req, res, next) => {
+  console.error({
+    message: err.message,
+    stack: err.stack,
+    path: req.originalUrl,
+    method: req.method,
+  });
+
+  const statusCode = err.statusCode || 500;
+  const clientMessage = err.isOperational ? err.message : 'Something went wrong';
+
+  res.status(statusCode).json({ error: clientMessage });
 });
 
 // DB connect & listen

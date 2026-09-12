@@ -1,22 +1,33 @@
 const session = require('express-session');
-const { RedisStore } = require('../config/redis');
+
+const { RedisStore, redis } = require('../config/redis');
 
 const isProduction = process.env.NODE_ENV === 'production';
 
 const sessionMiddleware = session({
-  store: new RedisStore({ client: require('../config/redis').redis }),
+  store: new RedisStore({
+    client: redis,
+  }),
+
   secret: process.env.SESSION_SECRET,
-  name: 'sid',                    // Cookie name
+
+  name: 'sid',
+
   resave: false,
+
   saveUninitialized: false,
-  rolling: true,                  // Reset expiry on activity
+
+  rolling: true,
+
   cookie: {
     httpOnly: true,
-    // secure: isProduction,
-    // sameSite: isProduction ? 'none' : 'lax',
-    secure: true,
-    sameSite: 'none',
+
+    secure: isProduction,
+
+    sameSite: isProduction ? 'none' : 'lax',
+
     maxAge: 1000 * 60 * 60 * 24 * 7,
+
     path: '/',
   },
 });

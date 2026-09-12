@@ -18,7 +18,7 @@
 
 const crypto = require('crypto');
 
-const uploadImage = async (file, publicId) => {
+const uploadImage = async (file, publicId, verifiedMime) => {
   const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
   const apiKey = process.env.CLOUDINARY_API_KEY;
   const apiSecret = process.env.CLOUDINARY_API_SECRET;
@@ -27,7 +27,7 @@ const uploadImage = async (file, publicId) => {
   const signature = crypto.createHash('sha1').update(toSign).digest('hex');
 
   const fd = new FormData();
-  fd.append('file', new Blob([file.data], { type: file.mimetype || 'image/jpeg' }), file.name || `${publicId}.jpg`);
+  fd.append('file', new Blob([file.data], { type: verifiedMime }), file.name || `${publicId}.jpg`);
   fd.append('api_key', apiKey);
   fd.append('public_id', publicId);
   fd.append('folder', 'e-shopping/products');
