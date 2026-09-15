@@ -3,7 +3,7 @@ var express = require('express');
 var router = express.Router();
 var productHelpers = require('../helpers/product-helpers');
 var adminAuth = require('../auth/adminauth');
-const { requireAdmin } = require('../middleware/authSession');
+const { requireAdminToken } = require('../middleware/adminTokenAuth');
 const { loginLimiter } = require('../middleware/rateLimit');
 const validateObjectId = require('../middleware/validateObjectId');
 const {
@@ -17,39 +17,27 @@ router.post('/login', loginLimiter, validate(adminLoginSchema), (req, res) => {
   adminAuth.doLogin(req, res)
     .then((response) => res.json(response))
     .catch((err) => {
-      console.error('Admin login error:', err);
       res.status(500).json({ error: 'Login failed' });
     });
 });
 
-
-router.post('/logout', requireAdmin, (req, res) => {
-  adminAuth.doLogout(req, res)
-    .then((response) => res.json(response))
-    .catch((err) => {
-      console.error('Admin logout error:', err);
-      res.status(500).json({ error: 'Logout failed' });
-    });
+router.post('/logout', requireAdminToken, (req, res) => {
+  adminAuth.doLogout(req, res).then((response) => res.json(response));
 });
 
-router.get('/me', (req, res) => {
-  adminAuth.getMe(req)
-    .then((response) => res.json(response))
-    .catch((err) => {
-      console.error('Admin session check error:', err);
-      res.status(500).json({ error: 'Failed to check authentication' });
-    });
+router.get('/me', requireAdminToken, (req, res) => {
+  adminAuth.getMe(req).then((response) => res.json(response));
 });
 
 // POST /admin/add-admin
-router.post('/add-admin', (req, res) => {
+router.post('/add-admin', requireAdminToken, (req, res) => {
   adminAuth.addAdmin(req.body)
     .then((response) => res.json(response))
     .catch((err) => res.status(500).json({ error: 'Failed to add admin' }));
 });
 
 // GET /admin/ — all products
-router.get('/', requireAdmin, (req, res) => {
+router.get('/', requireAdminToken, (req, res) => {
   productHelpers.getAllproducts()
     .then((products) => res.json({ products }))
     .catch((err) => {
@@ -72,7 +60,7 @@ const { uploadImage } = require('../helpers/cloudinary'); // adjust path to wher
 
 const { validateImageFile } = require('../helpers/validateImage');
 
-router.post('/add-product', requireAdmin, async (req, res) => {
+router.post('/add-product', requireAdminToken, async (req, res) => {
   try {
     const id = await productHelpers.addProduct(req.body);
     let imageUrl = '';
@@ -99,21 +87,21 @@ router.post('/add-product', requireAdmin, async (req, res) => {
 
 
 // DELETE /admin/delete-product/:id
-router.delete('/delete-product/:id', requireAdmin, validateObjectId('id'), (req, res) => {
+router.delete('/delete-product/:id', requireAdminToken, validateObjectId('id'), (req, res) => {
   productHelpers.deleteproduct(req.params.id)
     .then(() => res.json({ status: true }))
     .catch((err) => res.status(500).json({ error: 'Failed to delete product' }));
 });
 
 // GET /admin/edit-product/:id
-router.get('/edit-product/:id', validateObjectId('id'), requireAdmin, (req, res) => {
+router.get('/edit-product/:id', validateObjectId('id'), requireAdminToken , (req, res) => {
   productHelpers.getProductDetails(req.params.id)
     .then((product) => res.json({ product }))
     .catch((err) => res.status(500).json({ error: 'Failed to fetch product' }));
 });
 
 
-router.put('/edit-product/:id', requireAdmin, validateObjectId('id'), async (req, res) => {
+router.put('/edit-product/:id', requireAdminToken, validateObjectId('id'), async (req, res) => {
   try {
     let imageUrl = '';
 
@@ -139,7 +127,7 @@ router.put('/edit-product/:id', requireAdmin, validateObjectId('id'), async (req
 });
 
 // GET /admin/all-orders
-router.get('/all-orders', requireAdmin, async (req, res) => {
+router.get('/all-orders', requireAdminToken, async (req, res) => {
   try {
     const orders = await productHelpers.getAllOrders();
     const grouped = orders.reduce((acc, order) => {
@@ -162,21 +150,21 @@ router.get('/all-orders', requireAdmin, async (req, res) => {
 });
 
 // POST /admin/ship-order
-router.post('/ship-order', requireAdmin, (req, res) => {
+router.post('/ship-order', requireAdminToken, (req, res) => {
   productHelpers.shipOrder(req.body.id)
     .then(() => res.json({ status: true }))
     .catch((err) => res.status(500).json({ error: 'Failed to ship order' }));
 });
 
 // GET /admin/all-users
-router.get('/all-users', requireAdmin, (req, res) => {
+router.get('/all-users', requireAdminToken, (req, res) => {
   adminAuth.getAllUsers()
     .then((users) => res.json({ users }))
     .catch((err) => res.status(500).json({ error: 'Failed to fetch users' }));
 });
 
 // GET /admin/admin-list
-router.get('/admin-list', requireAdmin, (req, res) => {
+router.get('/admin-list', requireAdminToken, (req, res) => {
   adminAuth.getAllAdmins()
     .then((admins) => res.json({ admins }))
     .catch((err) => res.status(500).json({ error: 'Failed to fetch admins' }));

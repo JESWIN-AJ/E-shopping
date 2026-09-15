@@ -19,4 +19,4 @@ const requireAdmin = (req, res, next) => {
   });
 };
 
-module.exports = { requireUser, requireAdmin };
+module.exports = { requireUser };

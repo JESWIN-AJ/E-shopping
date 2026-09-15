@@ -10,29 +10,9 @@ const helmet = require('helmet');
 
 const app = express();
 
-
 app.use(helmet());
-
 app.use(morgan('dev'));
 
-
-
-
-// app.use((req, res, next) => {
-//   console.log('=================================');
-//   console.log('REQUEST RECEIVED');
-//   console.log('Method:', req.method);
-//   console.log('URL:', req.originalUrl);
-//   console.log('Origin:', req.headers.origin);
-//   console.log('Cookies:', req.headers.cookie);
-//   console.log('=================================');
-
-//   next();
-// });
-
-
-
-// Trust proxy (required for secure cookies behind Render proxy)
 app.set('trust proxy', 1);
 
 const allowedOrigins = [
@@ -44,36 +24,34 @@ app.use(cors({
   origin: allowedOrigins,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'X-CSRF-Token'],
-  exposedHeaders: ['X-CSRF-Token'], 
+  allowedHeaders: ['Content-Type', 'X-CSRF-Token', 'Authorization'],
+  exposedHeaders: ['X-CSRF-Token'],
 }));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(sessionMiddleware);
-app.use(csrfProtection);
-app.use(csrfHeader);  // Exposes x-csrf-token header
 
 // Static files
 app.use('/product-images', express.static(path.join(__dirname, '..', 'public', 'product-images')));
 
-
 const fileUpload = require('express-fileupload');
-
 app.use(fileUpload({
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB cap
+  limits: { fileSize: 5 * 1024 * 1024 },
   abortOnLimit: true,
   useTempFiles: false,
   safeFileNames: true,
   preserveExtension: 4,
 }));
 
-
 // Routes
 const userRouter = require('./routes/user');
 const adminRouter = require('./routes/admin');
-app.use('/', userRouter);
+
+// User routes: cookie/session/CSRF-based, now scoped to /user
+app.use('/user', sessionMiddleware, csrfProtection, csrfHeader, userRouter);
+
+// Admin routes: token-based, no cookies/CSRF at all
 app.use('/admin', adminRouter);
 
 // CSRF error handler
@@ -83,6 +61,7 @@ app.use((err, req, res, next) => {
   }
   next(err);
 });
+
 app.use((req, res) => {
   res.status(404).json({ error: 'Not found' });
 });
@@ -116,7 +95,5 @@ db.connect((err) => {
     console.log(`Server running on port ${PORT}, DB connected`);
   });
 });
-
-// Logs HTTP requests
 
 module.exports = app;

@@ -2,76 +2,28 @@ import axios from 'axios';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
-  withCredentials: true, // sends the session cookie ('sid') and CSRF cookie automatically
 });
 
-// ---- CSRF token handling ----
-// Your backend's csrfHeader middleware sends the current token back on
-// EVERY response via the x-csrf-token header. Cache it and attach it to
-// every state-changing request.
-let csrfToken = null;
+let adminToken = null;
 
-const UNSAFE_METHODS = ['post', 'put', 'patch', 'delete'];
-
-// api.interceptors.request.use((config) => {
-//   if (csrfToken && UNSAFE_METHODS.includes(config.method)) {
-// //     config.headers['X-CSRF-Token'] = csrfToken;
-// //   }
-// //   return config;
-// // });
-
-// api.interceptors.response.use(
-//   (res) => {
-//     const token = res.headers['x-csrf-token'];
-//     if (token) csrfToken = token;
-//     return res;
-//   },
-//   (err) => {
-//     const token = err.response?.headers?.['x-csrf-token'];
-//     if (token) csrfToken = token;
-
-//     if (err.response?.status === 401 || err.response?.status === 403) {
-//       window.location.href = '/login';
-//     }
-//     return Promise.reject(err);
-//   }
-// );
-
-api.interceptors.response.use(
-  (response) => {
-    const token = response.headers['x-csrf-token'];
-    console.log('[CSRF] received:', token, 'from:', response.config.url);
-    if (token) csrfToken = token;
-    return response;
-  },
-   (err) => {
-    const token = err.response?.headers?.['x-csrf-token'];
-    if (token) csrfToken = token;
-
-    if (err.response?.status === 401 || err.response?.status === 403) {
-      window.location.href = '/login';
-    }
-    return Promise.reject(err);
-  }
-);
+export const setAdminToken = (token) => { adminToken = token; };
+export const clearAdminToken = () => { adminToken = null; };
 
 api.interceptors.request.use((config) => {
-  if (csrfToken && UNSAFE_METHODS.includes(config.method)) {
-    config.headers['X-CSRF-Token'] = csrfToken;
+  if (adminToken) {
+    config.headers['Authorization'] = `Bearer ${adminToken}`;
   }
-  console.log('[CSRF] sending:', csrfToken, 'method:', config.method, 'url:', config.url);
   return config;
 });
 
-// Call this once on app load (e.g. in App.jsx's root useEffect), before
-// any admin action that needs a CSRF token can fire.
-export const primeCsrfToken = async () => {
-  try {
-    await api.get('/admin/me');
-  } catch {
-    // Ignore — admin might just be logged out. Token still gets cached
-    // from the response headers above regardless of status.
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
   }
-};
+);
 
 export default api;
